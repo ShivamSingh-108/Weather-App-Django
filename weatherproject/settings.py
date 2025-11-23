@@ -20,12 +20,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'y!^f73w5xi5zi17+q&hu+krknlm*j&018xfy8xx5(a)axn0%b%'
+# SECURITY WARNING: keep the secret key used in production secret!
+# Use environment variable in production; keep a harmless default for local dev.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "insecure-dev-secret-key-replace-me"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Control via env var DJANGO_DEBUG = "True" or "False". Defaults to True for dev.
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS: read from env var (comma-separated). Defaults to localhost for dev.
+_allowed = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost")
+ALLOWED_HOSTS = [h.strip() for h in _allowed.split(",") if h.strip()]
 
 
 # Application definition
@@ -118,7 +126,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
 STATIC_URL = '/static/'
+
+# Where collectstatic will place files for production
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Additional static file locations for development
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static'),
 ]
+
